@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import "../styles/PerformanceDashboard.scss";
 import PerformanceDashboard from "../components/PerformanceDashboard.jsx";
 
 export default function Board() {

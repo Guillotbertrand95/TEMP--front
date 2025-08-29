@@ -1,0 +1,65 @@
+/* Globals.scss */
+
+/* Reset léger */
+* {
+	margin: 0;
+	padding: 0;
+}
+
+/* Body global */
+body {
+	font-family: "Chillax", sans-serif;
+	font-family: "Cabinet Grotesk", sans-serif;
+	background-color: #33658a;
+	color: white;
+}
+
+/* Titres */
+h1,
+h2,
+h3,
+h4 {
+	color: #222;
+	margin-bottom: 1rem;
+}
+
+/* Liens */
+a {
+	color: #007bff;
+	text-decoration: none;
+	transition: color 0.3s;
+
+	&:hover {
+		color: #0056b3;
+	}
+}
+
+/* Containers centrés */
+.container {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 2rem;
+}
+/* Boutons globaux */
+button {
+	font-family: inherit;
+	cursor: pointer;
+	border: none;
+	border-radius: 8px;
+	transition: background-color 0.3s, transform 0.2s;
+}
+/* Inputs globaux */
+input,
+select,
+textarea {
+	font-family: inherit;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	padding: 0.7rem 1rem;
+	transition: border 0.3s;
+
+	&:focus {
+		border-color: #007bff;
+		outline: none;
+	}
+}

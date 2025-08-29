@@ -1,10 +1,8 @@
-// components/PrivateRoute.jsx
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-export default function PrivateRoute({ token, children }) {
-	if (!token) {
-		return <Navigate to="/" />; // redirige si pas connecté
-	}
+export default function PrivateRoute({ children }) {
+	const token = localStorage.getItem("token"); // Lit directement depuis localStorage
+	if (!token) return <Navigate to="/" />; // Redirection si pas connecté
 	return children;
 }

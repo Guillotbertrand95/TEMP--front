@@ -1,42 +1,41 @@
-import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "./pages/Home.jsx";
 import DashBoard from "./pages/DashBoard.jsx";
 import User from "./pages/User.jsx";
-import Activity from "./pages/Activity.jsx";
+import ActivityPage from "./pages/Activity.jsx";
 import Layout from "./components/Layout.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
+import Login from "./components/Login.jsx";
+import Register from "./components/Register.jsx";
 
 function App() {
-	const [token, setToken] = useState(localStorage.getItem("token") || null);
-
-	const handleLogin = (token) => {
-		localStorage.setItem("token", token);
-		setToken(token);
-	};
-
 	const handleLogout = () => {
 		localStorage.removeItem("token");
-		setToken(null);
+		localStorage.removeItem("user");
 	};
 
 	return (
 		<Routes>
-			<Route path="/" element={<Home onLogin={handleLogin} />} />
+			{/* Pages publiques */}
+			<Route path="/" element={<Home />} />
+			<Route path="/login" element={<Login />} />
+			<Route path="/register" element={<Register />} />
 
+			{/* Pages protégées */}
 			<Route
 				element={
-					<PrivateRoute token={token}>
+					<PrivateRoute>
 						<Layout onLogout={handleLogout} />
 					</PrivateRoute>
 				}
 			>
 				<Route path="/dashboard" element={<DashBoard />} />
 				<Route path="/user" element={<User />} />
-				<Route path="/activity" element={<Activity />} />
+				<Route path="/activity" element={<ActivityPage />} />
 			</Route>
 
+			{/* Redirection par défaut */}
 			<Route path="*" element={<Navigate to="/" />} />
 		</Routes>
 	);

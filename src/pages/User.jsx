@@ -1,8 +1,13 @@
+// src/pages/User.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Formulaire from "../components/Formulaire.jsx";
+import { useNavigate } from "react-router-dom";
 
-export default function Profil() {
+export default function User() {
+	const navigate = useNavigate();
+	const token = localStorage.getItem("token");
+
 	const [formData, setFormData] = useState({
 		name: "",
 		age: "",
@@ -44,35 +49,72 @@ export default function Profil() {
 		},
 	];
 
+	// Récupérer le profil existant pour préremplir le formulaire
 	useEffect(() => {
-		// Récupérer le profil existant pour préremplir le formulaire
+		if (!token) return;
 		axios
 			.get("http://localhost:5000/api/profile", {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				},
+				headers: { Authorization: `Bearer ${token}` },
 			})
 			.then((res) => setFormData(res.data))
 			.catch((err) => console.error(err));
-	}, []);
-	console.log(localStorage.getItem("token")); // Vérifie que le token est bien stocké
+	}, [token]);
 
+	// Mettre à jour le profil
 	const handleSubmit = (data) => {
 		axios
 			.put("http://localhost:5000/api/profile", data, {
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				},
+				headers: { Authorization: `Bearer ${token}` },
 			})
 			.then(() => alert("Profil mis à jour"))
 			.catch(console.error);
 	};
 
+	// Supprimer le compte
+	const handleDeleteAccount = async () => {
+		const confirm = window.confirm(
+			"⚠️ Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
+		);
+		if (!confirm) return;
+
+		try {
+			await axios.delete("http://localhost:5000/api/profile", {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+
+			localStorage.removeItem("token");
+			localStorage.removeItem("user");
+			alert("Votre compte a été supprimé avec succès !");
+			navigate("/register");
+		} catch (err) {
+			console.error(err);
+			alert("Erreur lors de la suppression du compte.");
+		}
+	};
+
 	return (
-		<Formulaire
-			fields={fieldsProfil}
-			initialValues={formData}
-			onSubmit={handleSubmit}
-		/>
+		<div style={{ maxWidth: "600px", margin: "0 auto" }}>
+			<h2>Profil</h2>
+
+			<Formulaire
+				fields={fieldsProfil}
+				initialValues={formData}
+				onSubmit={handleSubmit}
+			/>
+
+			<button
+				onClick={handleDeleteAccount}
+				style={{
+					color: "red",
+					background: "transparent",
+					border: "1px solid red",
+					marginTop: "1rem",
+					padding: "0.5rem 1rem",
+					cursor: "pointer",
+				}}
+			>
+				Supprimer mon compte
+			</button>
+		</div>
 	);
 }

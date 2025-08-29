@@ -1,0 +1,61 @@
+.performance-dashboard {
+	max-width: 800px;
+	margin-top: 20px;
+	border-radius: 5px;
+	font-family: "Chillax", sans-serif;
+	font-family: "Cabinet Grotesk", sans-serif;
+	background-color: #6dacdc;
+
+	h2 {
+		text-align: center;
+		margin-bottom: 1rem;
+	}
+
+	.filters {
+		display: flex;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 1rem;
+		margin-left: 10px;
+
+		select {
+			padding: 0.5rem;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+			font-size: 0.9rem;
+		}
+	}
+
+	.period-buttons {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+		margin-left: 10px;
+		button {
+			padding: 0.5rem 1rem;
+			border: none;
+			border-radius: 5px;
+			background-color: #007bff;
+			color: white;
+			font-size: 0.9rem;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+
+			&:hover {
+				background-color: #0056b3;
+			}
+
+			&.active {
+				background-color: #28a745;
+			}
+		}
+	}
+
+	.stats {
+		margin-bottom: 1rem;
+		p {
+			margin: 0.2rem 0;
+			margin-left: 10px;
+		}
+	}
+}

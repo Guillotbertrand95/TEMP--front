@@ -2,9 +2,10 @@
 	max-width: 600px;
 	margin: 2rem auto;
 	padding: 1rem;
-	background-color: #bacde0;
+	background-color: #6dacdc;
 	border-radius: 12px;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	max-height: 180vh;
 
 	h3 {
 		margin-top: 2rem;
@@ -70,7 +71,7 @@
 			border-radius: 8px;
 			cursor: pointer;
 			transition: background-color 0.2s;
-
+			color: black;
 			&:hover {
 				background-color: #e9ecef;
 			}

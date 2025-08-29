@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "../styles/PerformanceDashboard.scss";
 import {
 	LineChart,
 	Line,
@@ -22,6 +23,7 @@ export default function PerformanceDashboard({ goals }) {
 	const [metric, setMetric] = useState("duration");
 	const [categoryFilter, setCategoryFilter] = useState("");
 	const [period, setPeriod] = useState("all"); // "all", "week", "month", "days3"
+
 	const token = localStorage.getItem("token");
 
 	// Charger les activités
@@ -43,7 +45,7 @@ export default function PerformanceDashboard({ goals }) {
 			}
 		};
 		fetchActivities();
-	}, []);
+	}, [token]);
 
 	// Filtrer par catégorie
 	const filteredByCategory = categoryFilter
@@ -72,7 +74,7 @@ export default function PerformanceDashboard({ goals }) {
 		calories: act.calories || 0,
 	}));
 
-	// Moyenne période précédente (ex: semaine dernière)
+	// Moyenne période précédente
 	const prevWeekActivities = activities.filter((act) => {
 		const actDate = new Date(act.date);
 		return (
@@ -80,7 +82,6 @@ export default function PerformanceDashboard({ goals }) {
 			actDate < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 		);
 	});
-
 	const prevAvg =
 		prevWeekActivities.reduce((sum, a) => sum + (a[metric] || 0), 0) /
 		(prevWeekActivities.length || 1);
@@ -94,44 +95,55 @@ export default function PerformanceDashboard({ goals }) {
 	const categories = [...new Set(activities.map((act) => act.category))];
 
 	return (
-		<div style={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}>
-			<h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
-				Performance Dashboard
-			</h2>
+		<div className="performance-dashboard">
+			<div style={{ width: "100%", maxWidth: "800px", margin: "0 auto" }}>
+				<h2 style={{ textAlign: "center", marginBottom: "1rem" }}>
+					Performance Dashboard
+				</h2>
 
-			{/* Filtres */}
-			<div
-				style={{
-					display: "flex",
-					gap: "1rem",
-					flexWrap: "wrap",
-					marginBottom: "1rem",
-				}}
-			>
-				<select
-					value={metric}
-					onChange={(e) => setMetric(e.target.value)}
+				{/* Filtres */}
+				<div
+					className="filters"
+					style={{
+						display: "flex",
+						gap: "1rem",
+						flexWrap: "wrap",
+						marginBottom: "1rem",
+					}}
 				>
-					{metrics.map((m) => (
-						<option key={m.key} value={m.key}>
-							{m.label}
-						</option>
-					))}
-				</select>
+					<select
+						value={metric}
+						onChange={(e) => setMetric(e.target.value)}
+					>
+						{metrics.map((m) => (
+							<option key={m.key} value={m.key}>
+								{m.label}
+							</option>
+						))}
+					</select>
 
-				<select
-					value={categoryFilter}
-					onChange={(e) => setCategoryFilter(e.target.value)}
+					<select
+						value={categoryFilter}
+						onChange={(e) => setCategoryFilter(e.target.value)}
+					>
+						<option value="">Toutes catégories</option>
+						{categories.map((c) => (
+							<option key={c} value={c}>
+								{c}
+							</option>
+						))}
+					</select>
+				</div>
+
+				{/* Boutons période */}
+				<div
+					className="period-buttons"
+					style={{
+						display: "flex",
+						gap: "0.5rem",
+						marginBottom: "1rem",
+					}}
 				>
-					<option value="">Toutes catégories</option>
-					{categories.map((c) => (
-						<option key={c} value={c}>
-							{c}
-						</option>
-					))}
-				</select>
-
-				<div>
 					<button onClick={() => setPeriod("days3")}>
 						3 derniers jours
 					</button>
@@ -143,21 +155,20 @@ export default function PerformanceDashboard({ goals }) {
 					</button>
 					<button onClick={() => setPeriod("all")}>Tout</button>
 				</div>
-			</div>
 
-			{/* Statistiques rapides */}
-			<div style={{ marginBottom: "1rem" }}>
-				<p>
-					Total {metric}: {currentTotal.toFixed(1)}
-				</p>
-				<p>Moyenne semaine précédente: {prevAvg.toFixed(1)}</p>
-				{goals && goals[metric] && (
+				{/* Statistiques rapides */}
+				<div className="stats">
 					<p>
-						Objectif {metric}: {goals[metric]}
+						Total {metric}: {currentTotal.toFixed(1)}
 					</p>
-				)}
+					<p>Moyenne semaine précédente: {prevAvg.toFixed(1)}</p>
+					{goals && goals[metric] && (
+						<p>
+							Objectif {metric}: {goals[metric]}
+						</p>
+					)}
+				</div>
 			</div>
-
 			{/* Graphique */}
 			<ResponsiveContainer width="100%" height={350}>
 				<LineChart
