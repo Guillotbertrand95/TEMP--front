@@ -1,16 +1,19 @@
+/* FormAct.scss */
 .activity-manager {
-	max-width: 600px;
+	max-width: 700px;
 	margin: 2rem auto;
-	padding: 1rem;
-	background-color: #6dacdc;
+
+	padding: 1.5rem;
+	background-color: #f5f8fb;
 	border-radius: 12px;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-	max-height: 180vh;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	font-family: Arial, sans-serif;
 
 	h3 {
-		margin-top: 2rem;
-		font-size: 1.4rem;
+		margin: 1.5rem 0 1rem;
+		font-size: 1.5rem;
 		color: #333;
+		text-align: center;
 	}
 
 	.formulaire {
@@ -21,79 +24,141 @@
 		&__group {
 			display: flex;
 			flex-direction: column;
-		}
 
-		&__label {
-			font-weight: 500;
-			margin-bottom: 0.3rem;
-			color: #555;
-		}
+			label {
+				font-weight: 500;
+				margin-bottom: 0.3rem;
+				color: #555;
+			}
 
-		&__input,
-		select {
-			padding: 0.5rem;
-			border: 1px solid #ccc;
-			border-radius: 6px;
-			font-size: 1rem;
-			transition: border-color 0.2s;
+			input,
+			select {
+				padding: 0.5rem 0.8rem;
+				border: 1px solid #ccc;
+				border-radius: 6px;
+				font-size: 1rem;
+				transition: border-color 0.2s;
 
-			&:focus {
-				border-color: #007bff;
-				outline: none;
+				&:focus {
+					border-color: #007bff;
+					outline: none;
+				}
 			}
 		}
 
-		&__button {
-			padding: 0.7rem 1rem;
+		button[type="submit"] {
+			padding: 0.8rem 1.2rem;
 			background-color: #007bff;
 			color: #fff;
-			font-weight: 600;
+			font-weight: bold;
 			border: none;
-			border-radius: 8px;
+			border-radius: 6px;
 			cursor: pointer;
-			transition: background-color 0.2s;
+			transition: all 0.3s ease;
+			margin-top: 0.5rem;
 
 			&:hover {
 				background-color: #0056b3;
 			}
-		}
-	}
 
-	ul {
-		margin-top: 1rem;
-		padding-left: 0;
-		list-style: none;
-
-		li {
-			padding: 0.6rem 0.8rem;
-			margin-bottom: 0.5rem;
-			background-color: #fff;
-			border-radius: 8px;
-			cursor: pointer;
-			transition: background-color 0.2s;
-			color: black;
-			&:hover {
-				background-color: #e9ecef;
+			&:active {
+				transform: scale(0.98);
 			}
 		}
 	}
 
-	// Responsive
-	@media (max-width: 480px) {
-		padding: 1rem;
+	.toggle-list {
+		display: block;
+		width: 100%;
+		text-align: center;
+		padding: 0.7rem 1rem;
+		margin: 1.2rem 0;
+		background-color: #28a745;
+		color: white;
+		font-weight: bold;
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: all 0.3s ease;
 
-		.formulaire__input,
-		select {
-			font-size: 0.9rem;
+		&:hover {
+			background-color: #1e7e34;
 		}
 
-		.formulaire__button {
-			font-size: 0.95rem;
-			padding: 0.6rem;
-		}
-
-		h3 {
-			font-size: 1.2rem;
+		&:active {
+			transform: scale(0.98);
 		}
 	}
+
+	.activities-container {
+		.activity-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 1rem;
+
+			.activity-card {
+				background-color: #fff;
+
+				padding: 1rem;
+				border-radius: 8px;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+				cursor: pointer;
+				transition: all 0.2s ease;
+
+				&:hover {
+					box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+					transform: translateY(-2px);
+				}
+
+				p {
+					margin: 0.3rem 0;
+					font-size: 0.95rem;
+
+					strong {
+						color: #030101;
+					}
+				}
+			}
+		}
+	}
+}
+.recent-activities {
+	margin-top: 2rem;
+
+	h3 {
+		margin-bottom: 1rem;
+		font-size: 1.3rem;
+		color: #333;
+	}
+
+	.activity-buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+
+		.activity-btn {
+			padding: 0.5rem 1rem;
+			background-color: #28a745;
+			color: black;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-weight: 500;
+			transition: background-color 0.2s;
+
+			&:hover {
+				background-color: #1e7e34;
+			}
+
+			&:active {
+				transform: scale(0.97);
+			}
+		}
+	}
+}
+.activity-card {
+	display: flex;
+	flex-direction: row;
+	color: #030101;
+	gap: 5px;
 }

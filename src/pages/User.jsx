@@ -1,94 +1,78 @@
 // src/pages/User.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Formulaire from "../components/Formulaire.jsx";
 import { useNavigate } from "react-router-dom";
+import FormulaireR from "../animations/FormulaireR.jsx";
 
 export default function User() {
 	const navigate = useNavigate();
 	const token = localStorage.getItem("token");
 
-	const [formData, setFormData] = useState({
-		name: "",
-		age: "",
-		height: "",
-		weight: "",
-		goal: "",
-	});
+	const [formData, setFormData] = useState({});
 
-	const fieldsProfil = [
-		{
-			name: "name",
-			label: "Nom",
-			type: "text",
-			placeholder: "Entrez votre nom",
-		},
-		{
-			name: "age",
-			label: "Âge",
-			type: "number",
-			placeholder: "Entrez votre âge",
-		},
-		{
-			name: "height",
-			label: "Taille",
-			type: "number",
-			placeholder: "Entrez votre taille",
-		},
-		{
-			name: "weight",
-			label: "Poids",
-			type: "number",
-			placeholder: "Entrez votre poids",
-		},
-		{
-			name: "goal",
-			label: "Objectif",
-			type: "text",
-			placeholder: "Entrez votre objectif",
-		},
+	const profileFields = [
+		{ name: "name", label: "Nom", type: "text", required: true },
+		{ name: "email", label: "Email", type: "email", required: true },
+		{ name: "age", label: "Âge", type: "number" },
+		{ name: "height", label: "Taille", type: "number" },
+		{ name: "weight", label: "Poids", type: "number" },
+		{ name: "goal", label: "Objectif", type: "text" },
 	];
 
-	// Récupérer le profil existant pour préremplir le formulaire
+	// ⚡ Récupération des infos du profil
 	useEffect(() => {
-		if (!token) return;
-		axios
-			.get("http://localhost:5000/api/profile", {
-				headers: { Authorization: `Bearer ${token}` },
-			})
-			.then((res) => setFormData(res.data))
-			.catch((err) => console.error(err));
+		const fetchProfile = async () => {
+			if (!token) return;
+			try {
+				const res = await axios.get(
+					"http://localhost:5000/api/profile",
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+				const profile = res.data;
+
+				setFormData({
+					name: profile.user?.name || "",
+					email: profile.user?.email || "",
+					age: profile.age || "",
+					height: profile.height || "",
+					weight: profile.weight || "",
+					goal: profile.goal || "",
+				});
+			} catch (err) {
+				console.error(err);
+			}
+		};
+		fetchProfile();
 	}, [token]);
 
-	// Mettre à jour le profil
-	const handleSubmit = (data) => {
-		axios
-			.put("http://localhost:5000/api/profile", data, {
+	const handleSubmit = async (data) => {
+		try {
+			await axios.put("http://localhost:5000/api/profile", data, {
 				headers: { Authorization: `Bearer ${token}` },
-			})
-			.then(() => alert("Profil mis à jour"))
-			.catch(console.error);
+			});
+			alert("Profil mis à jour ✅");
+		} catch (err) {
+			console.error(err);
+			alert("Erreur lors de la mise à jour du profil");
+		}
 	};
 
-	// Supprimer le compte
 	const handleDeleteAccount = async () => {
-		const confirm = window.confirm(
-			"⚠️ Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
-		);
-		if (!confirm) return;
+		if (!window.confirm("⚠️ Supprimer votre compte ?")) return;
 
 		try {
 			await axios.delete("http://localhost:5000/api/profile", {
 				headers: { Authorization: `Bearer ${token}` },
 			});
-
 			localStorage.removeItem("token");
 			localStorage.removeItem("user");
-			alert("Votre compte a été supprimé avec succès !");
+			alert("Compte supprimé ✅");
 			navigate("/register");
 		} catch (err) {
 			console.error(err);
-			alert("Erreur lors de la suppression du compte.");
+			alert("Erreur lors de la suppression du compte");
 		}
 	};
 
@@ -96,25 +80,12 @@ export default function User() {
 		<div style={{ maxWidth: "600px", margin: "0 auto" }}>
 			<h2>Profil</h2>
 
-			<Formulaire
-				fields={fieldsProfil}
-				initialValues={formData}
+			<FormulaireR
+				fields={profileFields}
+				defaultValues={formData}
 				onSubmit={handleSubmit}
+				onDelete={handleDeleteAccount}
 			/>
-
-			<button
-				onClick={handleDeleteAccount}
-				style={{
-					color: "red",
-					background: "transparent",
-					border: "1px solid red",
-					marginTop: "1rem",
-					padding: "0.5rem 1rem",
-					cursor: "pointer",
-				}}
-			>
-				Supprimer mon compte
-			</button>
 		</div>
 	);
 }

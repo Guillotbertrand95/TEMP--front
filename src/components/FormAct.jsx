@@ -42,11 +42,11 @@ export default function ActivityManager() {
 	const [subOptions, setSubOptions] = useState([]);
 	const [activities, setActivities] = useState([]);
 	const [editingId, setEditingId] = useState(null);
-	const [showList, setShowList] = useState(false); // ✅ déplacer ici
+	const [showList, setShowList] = useState(false);
 
 	const token = localStorage.getItem("token");
 
-	// Charger la liste des activités
+	// Charger les activités
 	const fetchActivities = async () => {
 		try {
 			const res = await axios.get(
@@ -62,14 +62,9 @@ export default function ActivityManager() {
 	};
 
 	useEffect(() => {
-		if (!token) {
-			console.warn("⚠️ Aucun token trouvé, veuillez vous connecter.");
-			return;
-		}
-		fetchActivities();
+		if (token) fetchActivities();
 	}, [token]);
 
-	// Changement catégorie → sous-catégories dynamiques
 	const handleCategoryChange = (e) => {
 		const category = e.target.value;
 		setFormData({ ...formData, category, subCategory: "" });
@@ -90,7 +85,9 @@ export default function ActivityManager() {
 				await axios.put(
 					`http://localhost:5000/api/activities/${editingId}`,
 					formData,
-					{ headers: { Authorization: `Bearer ${token}` } }
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
 				);
 				setEditingId(null);
 			} else {
@@ -102,11 +99,10 @@ export default function ActivityManager() {
 					}
 				);
 			}
-
 			alert("Activité enregistrée !");
 			setFormData(initialForm);
 			setSubOptions([]);
-			fetchActivities(); // rafraîchir la liste
+			fetchActivities();
 		} catch (err) {
 			console.error(err);
 			alert("Erreur lors de l'enregistrement");
@@ -115,7 +111,7 @@ export default function ActivityManager() {
 
 	const handleEdit = (activity) => {
 		setFormData({
-			date: activity.date ? activity.date.split("T")[0] : "",
+			date: activity.date?.split("T")[0] || "",
 			category: activity.category || "",
 			subCategory: activity.subCategory || "",
 			duration: activity.duration || "",
@@ -131,130 +127,155 @@ export default function ActivityManager() {
 		setEditingId(activity._id);
 	};
 
+	const handleResetAll = async () => {
+		const confirm = window.confirm(
+			"⚠️ Voulez-vous vraiment supprimer toutes vos activités ?"
+		);
+		if (!confirm) return;
+
+		try {
+			await axios.delete("http://localhost:5000/api/activities", {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			setActivities([]);
+			alert("Toutes vos activités ont été supprimées !");
+		} catch (err) {
+			console.error(err);
+			alert("Erreur lors de la suppression de vos activités");
+		}
+	};
+	const handleDelete = async (id) => {
+		if (!window.confirm("Voulez-vous vraiment supprimer cette activité ?"))
+			return;
+		try {
+			await axios.delete(`http://localhost:5000/api/activities/${id}`, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			setActivities(activities.filter((act) => act._id !== id));
+			alert("Activité supprimée !");
+		} catch (err) {
+			console.error(err);
+			alert("Erreur lors de la suppression");
+		}
+	};
+
 	return (
 		<div className="activity-manager">
 			<form onSubmit={handleSubmit} className="formulaire">
-				<div className="formulaire__group">
-					<label>Date</label>
-					<input
-						type="date"
-						name="date"
-						value={formData.date}
-						onChange={handleChange}
-					/>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Catégorie</label>
-					<select
-						name="category"
-						value={formData.category}
-						onChange={handleCategoryChange}
-					>
-						<option value="">Sélectionnez une catégorie</option>
-						{activityCategories.map((c) => (
-							<option key={c.category} value={c.category}>
-								{c.category}
-							</option>
-						))}
-					</select>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Sous-catégorie</label>
-					<select
-						name="subCategory"
-						value={formData.subCategory}
-						onChange={handleChange}
-						disabled={!subOptions.length}
-					>
-						<option value="">
-							Sélectionnez une sous-catégorie
-						</option>
-						{subOptions.map((sub) => (
-							<option key={sub} value={sub}>
-								{sub}
-							</option>
-						))}
-					</select>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Durée (minutes)</label>
-					<input
-						type="number"
-						name="duration"
-						value={formData.duration}
-						onChange={handleChange}
-					/>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Distance (km)</label>
-					<input
-						type="number"
-						name="distance"
-						value={formData.distance}
-						onChange={handleChange}
-					/>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Intensité</label>
-					<select
-						name="intensity"
-						value={formData.intensity}
-						onChange={handleChange}
-					>
-						<option value="">Sélectionnez l'intensité</option>
-						<option value="Facile">Facile</option>
-						<option value="Modéré">Modéré</option>
-						<option value="Difficile">Difficile</option>
-					</select>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Calories brûlées</label>
-					<input
-						type="number"
-						name="calories"
-						value={formData.calories}
-						onChange={handleChange}
-					/>
-				</div>
-
-				<div className="formulaire__group">
-					<label>Commentaire</label>
-					<input
-						type="text"
-						name="comment"
-						value={formData.comment}
-						onChange={handleChange}
-					/>
-				</div>
+				{/* Formulaire */}
+				{Object.keys(initialForm).map((key) => {
+					if (key === "category") {
+						return (
+							<div className="formulaire__group" key={key}>
+								<label>Catégorie</label>
+								<select
+									name="category"
+									value={formData.category}
+									onChange={handleCategoryChange}
+								>
+									<option value="">
+										Sélectionnez une catégorie
+									</option>
+									{activityCategories.map((c) => (
+										<option
+											key={c.category}
+											value={c.category}
+										>
+											{c.category}
+										</option>
+									))}
+								</select>
+							</div>
+						);
+					} else if (key === "subCategory") {
+						return (
+							<div className="formulaire__group" key={key}>
+								<label>Sous-catégorie</label>
+								<select
+									name="subCategory"
+									value={formData.subCategory}
+									onChange={handleChange}
+									disabled={!subOptions.length}
+								>
+									<option value="">
+										Sélectionnez une sous-catégorie
+									</option>
+									{subOptions.map((sub) => (
+										<option key={sub} value={sub}>
+											{sub}
+										</option>
+									))}
+								</select>
+							</div>
+						);
+					} else if (key === "intensity") {
+						return (
+							<div className="formulaire__group" key={key}>
+								<label>Intensité</label>
+								<select
+									name="intensity"
+									value={formData.intensity}
+									onChange={handleChange}
+								>
+									<option value="">
+										Sélectionnez l'intensité
+									</option>
+									<option value="Facile">Facile</option>
+									<option value="Modéré">Modéré</option>
+									<option value="Difficile">Difficile</option>
+								</select>
+							</div>
+						);
+					} else {
+						const type = key === "date" ? "date" : "text";
+						return (
+							<div className="formulaire__group" key={key}>
+								<label>
+									{key.charAt(0).toUpperCase() + key.slice(1)}
+								</label>
+								<input
+									type={type}
+									name={key}
+									value={formData[key]}
+									onChange={handleChange}
+								/>
+							</div>
+						);
+					}
+				})}
 
 				<button type="submit">
 					{editingId ? "Modifier" : "Sauvegarder"}
 				</button>
 			</form>
 
-			{/* Toggle liste */}
-			<button type="button" onClick={() => setShowList(!showList)}>
-				{showList ? "Masquer mes activités" : "Voir mes activités"}
-			</button>
-
-			{showList && (
-				<div>
-					<h3>Mes activités</h3>
-					<ul>
-						{activities.map((act) => (
-							<li key={act._id} onClick={() => handleEdit(act)}>
-								{act.date?.split("T")[0]} - {act.category} /{" "}
-								{act.subCategory || "-"} : {act.duration || "-"}{" "}
-								min
-							</li>
+			{activities.length > 0 && (
+				<button className="reset-all" onClick={handleResetAll}>
+					Réinitialiser toutes les activités
+				</button>
+			)}
+			{activities.length > 0 && (
+				<div className="recent-activities">
+					<h3>Dernières activités</h3>
+					<div className="activity-buttons">
+						{activities.slice(0, 5).map((act) => (
+							<div key={act._id} className="activity-card">
+								<button
+									className="delete-btn"
+									onClick={() => handleDelete(act._id)}
+								>
+									❌
+								</button>
+								<p>
+									<strong>Sous-catégorie:</strong>{" "}
+									{act.subCategory}
+								</p>
+								<button onClick={() => handleEdit(act)}>
+									Modifier
+								</button>
+							</div>
 						))}
-					</ul>
+					</div>
 				</div>
 			)}
 		</div>
